@@ -104,6 +104,10 @@ def jacobi(A,b,tol):
     D = np.diag(A)
     R = A - np.diagflat(D)
 
+    G = np.identity(N) - np.linalg.inv(np.diagflat(D)).dot(A)
+    eigs = np.linalg.eigvals(G)
+    print("Jacobi - spectral radius is : ", np.max(np.abs(eigs)))
+
     # Iterate for N times                               s                                                                                                                                           
     while (err[-1] > tol ):
         x = (b - np.dot(R,x)) / D
@@ -119,6 +123,14 @@ def gauss_seidel(A,b,tol):
     it=0
     err=[]
     err.append(calc_residual_norm(A,b,x))
+
+    # Create a vector of the diagonal elements of A                                                                                                                                                
+    # and subtract them from A                                                                                                                                                                     
+    D = np.diagflat(np.diag(A))
+    E = -np.triu(A, k=1)
+    G = np.identity(N) - np.linalg.inv(D-E).dot(A)
+    eigs = np.linalg.eigvals(G)
+    print("GS - spectral radius is : ", np.max(np.abs(eigs)))
 
 
     # Iterate for N times                               s                                                                                                                                           
@@ -243,6 +255,8 @@ def run_poisson(nx,ny):
   b = np.zeros([n])
   fill_matrix_poisson(A,b,nx,ny)
   T = np.linalg.solve(A,b)
+
+
   
   T_jac, err_jac=jacobi(A,b,1e-3)
   T_gs, err_gs  =gauss_seidel(A,b,1e-3)
@@ -291,6 +305,7 @@ def run_adv_diff(Pe,nx,ny):
   plt.colorbar()
   plt.show()
 
-run_adv_diff(10,25,25)
+run_poisson(25,25)
+#run_adv_diff(10,25,25)
 
 
