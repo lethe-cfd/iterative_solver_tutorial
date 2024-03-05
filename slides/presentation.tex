@@ -1,0 +1,144 @@
+\documentclass[t, 9pt,xcolor=dvipsnames]{beamer}
+
+%Insert number of slides
+\beamertemplatenavigationsymbolsempty
+\addtobeamertemplate{navigation symbols}{}{%
+    \usebeamerfont{footline}%
+    \usebeamercolor[fg]{footline}%
+    \hspace{1em}%
+    \insertframenumber/\inserttotalframenumber
+}
+
+%Define colors useful for presentation
+\definecolor{UniBlue}{RGB}{0,102,204}
+\definecolor{UniOrange}{RGB}{255,128,0}
+\definecolor{mygreen}{RGB}{120,190,33}
+\newcommand{\green}[1]{\textcolor{ForestGreen}{#1}}
+
+\setbeamercolor{title}{fg=UniBlue}
+\setbeamercolor{frametitle}{fg=UniBlue}
+\setbeamercolor{structure}{fg=UniBlue}
+\setbeamercolor{footline}{fg=black}
+\setbeamercolor{caption name}{fg=black}
+\setbeamercolor{bibliography item}{fg=black}
+\setbeamercolor*{bibliography entry title}{fg=black}
+\setbeamercolor*{bibliography entry author}{fg=black}
+\setbeamercolor*{bibliography entry location}{fg=black}
+\setbeamercolor*{bibliography entry note}{fg=black}
+
+\setbeamertemplate{section in toc}[sections numbered]
+\setbeamertemplate{caption}[numbered]
+\setbeamertemplate{bibliography item}{\insertbiblabel}
+
+%Additional packages
+\usepackage{blkarray}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{appendixnumberbeamer}
+\usepackage{pgfplots}
+\usepgfplotslibrary{groupplots,dateplot}
+\usetikzlibrary{patterns,shapes.arrows}
+\pgfplotsset{compat=newest}
+\usepackage{multimedia}
+\usepackage{media9}
+\usepackage{pbox}
+\usepackage{multirow}
+\usepackage[makeroom]{cancel}
+\usepackage[export]{adjustbox}
+\usepackage{tabularx}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{caption}
+\usepackage{xcolor}
+\usepackage{tikz,pgfplotstable,filecontents}
+\usepackage{listings}
+
+%Shading text: useful to highlight information
+\usepackage{framed, color}
+\definecolor{shadecolor}{RGB}{220,220,220}
+\usepackage{makecell}
+
+%New commands
+\newcommand{\code}[1]{{\fontfamily{pcr}\selectfont #1}}
+\renewcommand{\vec}[1]{\boldsymbol{#1}}         % for vectors
+\newcommand{\mat}[1]{\boldsymbol{#1}}           % for matrices
+\newcommand{\pp}[1]{\left(#1\right)}
+\newcommand{\dd}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\grad}{\nabla}
+% \captionsetup[algorithm]{labelformat=empty}
+
+\usepackage{subcaption}
+%Define logos for subojectives
+% \newcommand{\logoso1}{\setbeamertemplate{logo}{\includegraphics[width=0.1\textwidth]{images/so1.png}}
+\def\mathunderline#1#2{\color{#1}\underline{{\color{black}#2}}\color{black}}
+
+
+\usepackage{siunitx}
+
+\lstnewenvironment{PYTHON}
+{
+	\lstset{frame=tb,
+		language=python,
+		aboveskip=3mm,
+		belowskip=3mm,
+		showstringspaces=false,
+		columns=flexible,
+		basicstyle={\small\ttfamily},
+		numbers=none,
+		numberstyle=\tiny\color{gray},
+		keywordstyle=\color{blue},
+		commentstyle=\color{dkgreen},
+		stringstyle=\color{purple},
+		breaklines=true,
+		breakatwhitespace=true,
+		tabsize=3}
+}
+{}
+
+
+\title{\textbf{Linear algebra considerations of a matrix-free Navier Stokes solver}}
+\subtitle{Group meeting}
+\author{Bruno Blais}
+
+
+\begin{document}
+    %% Title slide
+	\begin{frame}
+	\vspace{0.5cm}
+		\begin{figure}
+	  		\includegraphics[scale = 0.12]{images/logo_lethe.png}\hspace*{0.2cm}
+	  		\includegraphics[scale = 0.4]{images/logo-poly.jpg}
+		\end{figure}
+		\titlepage
+	\end{frame}
+	
+	%%Contents slide
+	\begin{frame}
+		\frametitle{\textbf{Outline}}
+		\tableofcontents
+	\end{frame}
+	
+	%% Other slides
+	\section{Context and motivation}
+	\include{frames/motivation}
+	
+	\section{Problems}
+	\include{frames/problem}
+	
+
+    	
+	\section{Final remarks}
+    \include{frames/conclusions}
+	\include{frames/future_work}
+	
+	\nocite{*} %If I want all references in the .bib file to appear even without citation
+	\include{frames/references}    
+
+	%Additional slides
+    \appendix
+    % \include{frames/additional_slide}
+
+\end{document}

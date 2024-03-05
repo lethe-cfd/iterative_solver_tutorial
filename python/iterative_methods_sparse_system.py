@@ -31,7 +31,7 @@ def fill_matrix_poisson(A,b,nx,ny):
         A[k,k] = 1
         b[k] = 0      
 
-    # Intérieur
+    # Inside
     for i in range(1,nx-1):
         for j in range(1,ny-1):
             k = i+nx*j
@@ -40,6 +40,49 @@ def fill_matrix_poisson(A,b,nx,ny):
             A[k,k] = (2*Sx+2*Sy)
             A[k,k+1] = -Sx
             A[k,k+nx] = -Sy
+            b[k] = 10
+
+
+def fill_adv_diff(Pe,A,b,nx,ny):
+    dx = 1./ (nx-1)
+    dy = 1./ (ny-1)
+    Sx = 1. / dx**2
+    Sy = 1. / dy**2
+    UX = Pe / 2 / dx
+    UY = Pe / 2 / dy
+    
+    # Boundary conditions bottom
+    for i in range(0,nx):
+        A[i,i] = 1
+        b[i] = 0
+    
+    # Boundary condition top
+    for i in range(0,nx):
+        k = (ny-1)*nx+i
+        A[k,k] = 1
+        b[k] = 0
+
+    # Boundary condition left
+    for j in range(0,ny):
+        k = nx*(j)
+        A[k,k] = 1
+        b[k] = 0
+
+    # Boundary condition right
+    for j in range(0,ny):
+        k = (nx-1)+nx*(j-1)
+        A[k,k] = 1
+        b[k] = 0      
+
+    # Inside
+    for i in range(1,nx-1):
+        for j in range(1,ny-1):
+            k = i+nx*j
+            A[k,k-nx] = -Sy-UY
+            A[k,k-1] = -Sx-UX
+            A[k,k] = (2*Sx+2*Sy)
+            A[k,k+1] = -Sx+UX
+            A[k,k+nx] = -Sy+UY
             b[k] = 10
 
 def calc_residual_norm(A,b,x):
@@ -190,32 +233,64 @@ def gmres(A, b, tol) :
     y, _, _, _ = np.linalg.lstsq(H[:k+1,:k+1],xi[:k+1])
     # `Q_k` will have dimensions (n,k).
     x_k = x + Q[:,:k+1].dot(y)
+    print(x_k)
     return x_k, err
 
-nx = 25
-ny = 25
-n = nx*ny
-A = np.zeros((n,n)) 
-b = np.zeros([n])
-fill_matrix_poisson(A,b,nx,ny)
-T = np.linalg.solve(A,b)
 
-T_jac, err_jac=jacobi(A,b,1e-3)
-T_gs, err_gs  =gauss_seidel(A,b,1e-3)
-T_cg, err_cg  =conjugate_gradient(A,b,1e-3)
-T_gmres, err_gmres  =gmres(A,b,1e-3)
+def run_poisson(nx,ny):
+  n = nx*ny
+  A = np.zeros((n,n)) 
+  b = np.zeros([n])
+  fill_matrix_poisson(A,b,nx,ny)
+  T = np.linalg.solve(A,b)
+  
+  T_jac, err_jac=jacobi(A,b,1e-3)
+  T_gs, err_gs  =gauss_seidel(A,b,1e-3)
+  T_cg, err_cg  =conjugate_gradient(A,b,1e-3)
+  T_gmres, err_gmres  =gmres(A,b,1e-3)
+  
+  
+  plt.semilogy(err_jac,label="Jacobi")
+  plt.semilogy(err_gs,label="Gauss-Seidel")
+  plt.semilogy(err_cg,label="Conjugate Gradient")
+  plt.semilogy(err_gmres,label="GMRES")
+  
+  plt.legend()
+  plt.show()
+  
+  T_reshaped = T_gmres.reshape(nx,ny).transpose()
+  #
+  plt.contourf(T_reshaped)
+  plt.colorbar()
+  plt.show()
+  
+def run_adv_diff(Pe,nx,ny):
+  n = nx*ny
+  A = np.zeros((n,n)) 
+  b = np.zeros([n])
+  fill_adv_diff(Pe,A,b,nx,ny)
+  T = np.linalg.solve(A,b)
+  
+  T_jac, err_jac=jacobi(A,b,1e-3)
+  T_gs, err_gs  =gauss_seidel(A,b,1e-3)
+  T_cg, err_cg  =conjugate_gradient(A,b,1e-3)
+  T_gmres, err_gmres  =gmres(A,b,1e-3)
+  
+  
+  plt.semilogy(err_jac,label="Jacobi")
+  plt.semilogy(err_gs,label="Gauss-Seidel")
+  plt.semilogy(err_cg,label="Conjugate Gradient")
+  plt.semilogy(err_gmres,label="GMRES")
+  
+  plt.legend()
+  plt.show()
+  
+  T_reshaped = T.reshape(nx,ny).transpose()
+  #
+  plt.contourf(T_reshaped)
+  plt.colorbar()
+  plt.show()
+
+run_adv_diff(10,25,25)
 
 
-plt.semilogy(err_jac,label="Jacobi")
-plt.semilogy(err_gs,label="Gauss-Seidel")
-plt.semilogy(err_cg,label="Conjugate Gradient")
-plt.semilogy(err_gmres,label="GMRES")
-
-plt.legend()
-plt.show()
-
-#T_reshaped = T_jac.reshape(nx,ny).transpose()
-#
-#plt.contourf(T_reshaped)
-#plt.colorbar()
-#plt.show()
