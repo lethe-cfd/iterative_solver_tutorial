@@ -90,6 +90,10 @@ def calc_residual_norm(A,b,x):
     return np.linalg.norm(res)
 
 
+def plot(residual,label):
+    print("Plotting")
+    
+
 def jacobi(A,b,tol):
     N = b.size
     x = np.zeros(b.size)
@@ -159,7 +163,6 @@ def conjugate_gradient(A,b,tol):
         x = x + alpha*p
         r = b - A.dot(x)
         if np.sqrt(np.sum((r**2))) < tol:
-            print('Itr:', i)
             break
         else:
             beta = -np.dot(r,Ap)/np.dot(p,Ap)
@@ -169,143 +172,190 @@ def conjugate_gradient(A,b,tol):
 
     return x , err
 
-def arnoldi_single_iter(A, Q, k) :
-    """Compute a single iteration of Arnoldi
-    """
-    q = A.dot(Q[:,k])
-    h = np.zeros(k+2)
-    for i in range(k+1):
-        h[i] = q.T.dot(Q[:,i])
-        q -= h[i]*Q[:,i]
-    h[k+1] = np.linalg.norm(q)
-    q /= h[k+1]
-    return h,q
-
-def givens_coeffs(a,b):
-    """ """
-    c = a / np.sqrt(a**2 + b**2)
-    s = b / np.sqrt(a**2 + b**2)
-    return c, s
-
 def gmres(A, b, tol) :
-    """Solve linear system via the Generalized Minimal Residual Algorithm (GMRES).
-
-    Args:
-        A: Square matrix of shape (n,n) (must be nonsingular).
-        b: Right-hand side
-        tol: Tolerance of the system to be reached
-
-    Returns:
-        x_k: Vector of shape (n,1) representing converged solution for x.
-        err: list of size (it) corresponding of the evolution of the error through the iterations
-
-    """
+    """ """
     x = np.zeros(b.size)
-    max_iters = 50
+    max_iters = 100
+    e1 = np.zeros([max_iters+1])
+    e1[0] = 1
     n = b.size
-
-
     err=[]
     err.append(calc_residual_norm(A,b,x))
-
-    r = b - A.dot(x)
-    q = r / np.linalg.norm(r)
+    
+    
     Q = np.zeros((n,max_iters))
-    Q[:,0] = q.squeeze()
+    H = np.zeros((max_iters+1,max_iters))
+    
+    r = b - A.dot(x)
     beta = np.linalg.norm(r)
-    xi = np.zeros((n,1))
-    xi[0] = 1 # e_1 standard basis vector, xi will be updated
-    H = np.zeros((n+1,n))
-
-    F = np.zeros((max_iters,n,n))
-    for i in range(max_iters):
-        F[i] = np.eye(n)
-
-    for k in range(max_iters-1):
-        H[:k+2,k], Q[:,k+1] = arnoldi_single_iter(A,Q,k)
-
-        # Don't need to do this for 0,...,k since completed
-        c,s = givens_coeffs(H[k,k], H[k+1,k])
-        # kth rotation matrix
-        F[k, k,k] = c
-        F[k, k,k+1] = s
-        F[k, k+1,k] = -s
-        F[k, k+1,k+1] = c
-
-        # apply the rotation to both of these
-        H[:k+2,k] = F[k,:k+2,:k+2].dot(H[:k+2,k])
-        xi = F[k].dot(xi)
-        err.append(beta * np.linalg.norm(xi[k+1]))
-
-        if beta * np.linalg.norm(xi[k+1]) < tol:
+    Q[:,0] = r / beta
+    
+    for j in range(max_iters-1):
+        Q[:,j+1] = A.dot(Q[:,j])
+        for i in range(j+1):
+            H[i,j] = Q[:,i].dot(Q[:,j+1])
+            Q[:,j+1] = Q[:,j+1]- H[i,j]*Q[:,i]
+        H[j+1,j] = np.linalg.norm(Q[:,j+1])
+        #if (H[j+1,j]>1e-14):
+        Q[:,j+1] = Q[:,j+1]/H[j+1,j]
+    
+        HT = H[:j+2,:j+1].transpose()
+        HH= HT.dot(H[:j+2,:j+1])
+        Hb = beta * HT.dot(e1[:j+2])
+        y = np.linalg.solve(HH,Hb)
+    
+        #res = np.linalg.norm(H[:j+2,:j+1].dot(y) - beta* e1[:j+2])
+        x = Q[:,:j+1].dot(y)
+        res = np.linalg.norm(b - A.dot(x))
+        err.append(res)
+        if (res<tol):
             break
-
-    # When terminated, solve the least squares problem.
-    # `y` must be (k,1).
-    y, _, _, _ = np.linalg.lstsq(H[:k+1,:k+1],xi[:k+1])
-    # `Q_k` will have dimensions (n,k).
-    x_k = x + Q[:,:k+1].dot(y)
-    print(x_k)
-    return x_k, err
+    return x,err
 
 
-def run_poisson(nx,ny):
+def run_poisson(nx,ny,method):
   n = nx*ny
   A = np.zeros((n,n)) 
   b = np.zeros([n])
   fill_matrix_poisson(A,b,nx,ny)
-  T = np.linalg.solve(A,b)
-
-
+  T, err=method(A,b,1e-3)
+  return T,err
   
-  T_jac, err_jac=jacobi(A,b,1e-3)
-  T_gs, err_gs  =gauss_seidel(A,b,1e-3)
-  T_cg, err_cg  =conjugate_gradient(A,b,1e-3)
-  T_gmres, err_gmres  =gmres(A,b,1e-3)
-  
-  
-  plt.semilogy(err_jac,label="Jacobi")
-  plt.semilogy(err_gs,label="Gauss-Seidel")
-  plt.semilogy(err_cg,label="Conjugate Gradient")
-  plt.semilogy(err_gmres,label="GMRES")
-  
-  plt.legend()
-  plt.show()
-  
-  T_reshaped = T_gmres.reshape(nx,ny).transpose()
-  #
-  plt.contourf(T_reshaped)
-  plt.colorbar()
-  plt.show()
-  
-def run_adv_diff(Pe,nx,ny):
+def run_adv_diff(Pe,nx,ny,method):
   n = nx*ny
   A = np.zeros((n,n)) 
   b = np.zeros([n])
   fill_adv_diff(Pe,A,b,nx,ny)
-  T = np.linalg.solve(A,b)
   
-  T_jac, err_jac=jacobi(A,b,1e-3)
-  T_gs, err_gs  =gauss_seidel(A,b,1e-3)
-  T_cg, err_cg  =conjugate_gradient(A,b,1e-3)
-  T_gmres, err_gmres  =gmres(A,b,1e-3)
+  T, err=method(A,b,1e-3)
+  return T,err
   
   
-  plt.semilogy(err_jac,label="Jacobi")
-  plt.semilogy(err_gs,label="Gauss-Seidel")
-  plt.semilogy(err_cg,label="Conjugate Gradient")
-  plt.semilogy(err_gmres,label="GMRES")
   
-  plt.legend()
-  plt.show()
-  
-  T_reshaped = T.reshape(nx,ny).transpose()
-  #
-  plt.contourf(T_reshaped)
-  plt.colorbar()
-  plt.show()
 
-run_poisson(25,25)
+
+#run_poisson(25,25)
 #run_adv_diff(10,25,25)
 
+#Run Jacobi and see mesh influence
+# Poisson problem
+j_meshes=[5,10,20,30]
+j_its=[]
+for i in j_meshes:
+    T,err = run_poisson(i,i,jacobi)
+    j_its.append(len(err))
+
+plt.plot(j_meshes,j_its,'-o',label="Problem A")
+
+# Peclet=1
+j_its=[]
+for i in j_meshes:
+    T,err = run_adv_diff(1,i,i,jacobi)
+    j_its.append(len(err))
+
+plt.plot(j_meshes,j_its,'-^',label="Problem B - Pe=1")
+
+# Peclet=10
+j_its=[]
+for i in j_meshes:
+    T,err = run_adv_diff(10,i,i,jacobi)
+    j_its.append(len(err))
+
+plt.plot(j_meshes,j_its,'-s',label="Problem B - Pe=10")
+plt.legend()
+plt.show()
+
+
+#Run Gauss-Seidel and see mesh influence
+# Poisson problem
+j_meshes=[5,10,20,30]
+j_its=[]
+for i in j_meshes:
+    T,err = run_poisson(i,i,gauss_seidel)
+    j_its.append(len(err))
+
+plt.plot(j_meshes,j_its,'-o',label="Problem A")
+
+# Peclet=1
+j_its=[]
+for i in j_meshes:
+    T,err = run_adv_diff(1,i,i,gauss_seidel)
+    j_its.append(len(err))
+
+plt.plot(j_meshes,j_its,'-^',label="Problem B - Pe=1")
+
+# Peclet=10
+j_its=[]
+for i in j_meshes:
+    T,err = run_adv_diff(10,i,i,gauss_seidel)
+    j_its.append(len(err))
+
+plt.plot(j_meshes,j_its,'-s',label="Problem B - Pe=10")
+plt.legend()
+plt.show()
+
+
+#Run CG and see mesh influence
+# Poisson problem
+j_meshes=[5,10,20,30]
+j_its=[]
+for i in j_meshes:
+    T,err = run_poisson(i,i,conjugate_gradient)
+    j_its.append(len(err))
+
+plt.plot(j_meshes,j_its,'-o',label="Problem A")
+
+# Peclet=1
+j_its=[]
+for i in j_meshes:
+    T,err = run_adv_diff(1,i,i,conjugate_gradient)
+    j_its.append(len(err))
+
+plt.plot(j_meshes,j_its,'-^',label="Problem B - Pe=1")
+
+# Peclet=10
+j_its=[]
+for i in j_meshes:
+    T,err = run_adv_diff(10,i,i,conjugate_gradient)
+    j_its.append(len(err))
+
+plt.plot(j_meshes,j_its,'-s',label="Problem B - Pe=10")
+plt.legend()
+plt.show()
+
+#Run GMRES and see mesh influence
+# Poisson problem
+j_meshes=[5,10,20,30]
+j_its=[]
+for i in j_meshes:
+    T,err = run_poisson(i,i,gmres)
+    j_its.append(len(err))
+
+plt.plot(j_meshes,j_its,'-o',label="Problem A")
+
+# Peclet=1
+j_its=[]
+for i in j_meshes:
+    T,err = run_adv_diff(1,i,i,gmres)
+    j_its.append(len(err))
+
+plt.plot(j_meshes,j_its,'-^',label="Problem B - Pe=1")
+
+# Peclet=10
+j_its=[]
+for i in j_meshes:
+    T,err = run_adv_diff(10,i,i,gmres)
+    j_its.append(len(err))
+
+plt.plot(j_meshes,j_its,'-s',label="Problem B - Pe=10")
+plt.legend()
+plt.show()
+
+
+
+
+
+
+
+  
 

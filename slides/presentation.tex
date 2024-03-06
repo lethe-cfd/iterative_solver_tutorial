@@ -35,8 +35,7 @@
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
-\usepackage{algorithm}
-\usepackage{algorithmic}
+\usepackage{algorithm2e}
 \usepackage{appendixnumberbeamer}
 \usepackage{pgfplots}
 \usepgfplotslibrary{groupplots,dateplot}
@@ -49,8 +48,6 @@
 \usepackage[makeroom]{cancel}
 \usepackage[export]{adjustbox}
 \usepackage{tabularx}
-\usepackage{algorithm}
-\usepackage{algorithmic}
 \usepackage{caption}
 \usepackage{xcolor}
 \usepackage{tikz,pgfplotstable,filecontents}
@@ -92,7 +89,7 @@
 		numbers=none,
 		numberstyle=\tiny\color{gray},
 		keywordstyle=\color{blue},
-		commentstyle=\color{dkgreen},
+		commentstyle=\color{green},
 		stringstyle=\color{purple},
 		breaklines=true,
 		breakatwhitespace=true,
@@ -101,7 +98,19 @@
 {}
 
 
-\title{\textbf{Linear algebra considerations of a matrix-free Navier Stokes solver}}
+% Add an outline slide at the beginning of each new section
+\AtBeginSection[]
+{
+	{
+		\setbeamertemplate{footline}{} %this line removes slides numbers
+		\begin{frame}[noframenumbering]
+			\frametitle{Outline}
+			\tableofcontents[currentsection]
+		\end{frame}
+	}
+}
+
+\title{\textbf{Understanding iterative linear solvers for sparse systems}}
 \subtitle{Group meeting}
 \author{Bruno Blais}
 
@@ -132,7 +141,12 @@
 	
 	\section{Basic iterative methods}
 	\include{frames/iterative}
+	
+	\section{Krylov subspace methods}
+	\include{frames/krylov}
     	
+
+    
 	\section{Final remarks}
     \include{frames/conclusions}
 	\include{frames/future_work}
