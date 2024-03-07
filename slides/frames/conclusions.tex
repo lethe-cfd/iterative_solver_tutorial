@@ -1,6 +1,21 @@
 \begin{frame}
-	\frametitle{\textbf{6. Final remarks}}
+	\frametitle{\textbf{5. Final remarks}}
 
- 
+
+The tolerance seems like an easy parameter to figure out, but it is not.
+
+In practice, we will often be solving non-linear problems. This means that we need to solve multiple linear problems of the form:
+
+\[
+\mathcal{J}(x) \delta x = - R(x)
+\]
+
+where $\mathcal{J}(x)$ is a Jacobian matrix, $\delta x$ is a correction vector and $R(x)$ is the residual vector. When we apply newton Method, the residual will decrease (if everythign goes well) quadratically. 
+
+Consequently, the tolerance of our iterative solver should adapt to our location in the non-linear solution process. For the first iteration, you do not necessarily need to solve $\mathcal{J}(x) \delta x = - R(x)$ accurately, wheras for the last ones you do.
+
+The idea behind this principle of the Eisenstat Walker method.
+
+For some fun, see the following \href{https://scicomp.stackexchange.com/questions/33806/understanding-the-eisenstat-walker-method-for-choosing-the-tolerance-of-a-linear}{\color{orange}stack overflow post} 
     
 \end{frame}

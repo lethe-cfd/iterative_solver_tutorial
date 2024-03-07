@@ -1,5 +1,5 @@
 \subsection{Theory}
-\begin{frame}[fragile]{\textbf{3. Krylov subspace}}
+\begin{frame}[fragile]{\textbf{4. Krylov subspace}}
 
 In general, a projection method for solving the linear system:
 \[
@@ -30,7 +30,7 @@ This is tricky and I won't be able to present this in much detail, but we will p
 \subsection{Conjugate gradient }
 
 
-\begin{frame}[fragile]{\textbf{3. CG algorithm}}
+\begin{frame}[fragile]{\textbf{4. CG algorithm}}
 The conjugate gradient method is the simplest Krylov method (in my opinion). It is very efficient, but it only works for symmetric matrices. In the following, the scalar product is noted $(u,v)$.
 
 \vspace{0.5cm}
@@ -62,16 +62,14 @@ The conjugate gradient method is the simplest Krylov method (in my opinion). It 
 
 
 \begin{frame}
-	\frametitle{\textbf{3. CG result for Problem A}}
-\end{frame}
-
-\begin{frame}
-	\frametitle{\textbf{3. CG result for Problem B}}
+	\frametitle{\textbf{4. CG results}}
+\centering
+\includegraphics[width=0.95\linewidth]{images/cg_its}
 \end{frame}
 
 \subsection{GMRES}
 
-\begin{frame}[fragile]{\textbf{3. GMRES}}
+\begin{frame}[fragile]{\textbf{4. GMRES}}
 	The Generalized Minimal RESidual method (GMRES) is a projection method that aims a minimizing the residual norm over all the vectors of the Krylov subspace that is being built ($x^{(0)}+\mathcal{K}^{(m)}$).
 	
 	
@@ -89,28 +87,57 @@ The conjugate gradient method is the simplest Krylov method (in my opinion). It 
 	
 \end{frame}
 
-\begin{frame}[fragile]{\textbf{3. GMRES Algorithm}}
+\begin{frame}[fragile]{\textbf{4. GMRES Algorithm}}
+
 \begin{algorithm}[H]
-	\KwIn{\begin{itemize}
-			\item Given a starting point residual $r^{(0)}:=b-\mathcal{A}x^{(0)}$, $\beta:=\lVert r^{(0)} \rVert$ and $v^{(1)} = \frac{r^{(0)}}{\beta}$
-			\item Given a tolerance $\mathrm{tol}$ 
-	\end{itemize}}
+	\KwIn{A matrix $\mathcal{A}$, a RHS $b$, an initial guess $x^{(0)}$, a maximum number of Krylov vectors $p$ and a tolerance $\mathrm{tol}$}
+
+	$\mathcal{Q}\leftarrow$empty(size($b$),$p+1$)
 	
-	Initialize $j=0$
+	$\mathcal{H}\leftarrow$empty($p+1$,$p$)
 	
-	\While{ $\lVert r^{(j)} \rVert < \mathrm{tol}$}
+	$e_1 \leftarrow$ empty(size($b$),$p+1$) $ + [1,\dots,0]^T$
+	
+	$r^{(0)} = b-\mathcal{A}x^{(0)}$
+	
+	$\beta = \lVert r^{(0)} \rVert$
+
+	
+	$\mathcal{Q}_{:,0} = \frac{r^{(0)}}{\lVert r^{(0)} \rVert}$
+	
+	
+
+	\For{$j=0 \dots p-1$}
 	{
-		$\alpha^{(j)} := \frac{(r^{(j)},r^{(j)})}{(\mathcal{A}p^{(j)},p^{(j)})} $
-		
-		$x^{(j+1)} := x^{(j)} + \alpha^{(j)}p^{(j)}$
-		
-		$r^{(j+1)} = r^{(j)} - \alpha^{(j)} \mathcal{A}p^{(j)}$
-		
-		$\beta^{(j)} = \frac{(r^{(j+1)},r^{(j+1)})}{(r^{(j)},r^{(j)})}$
-		
-		$p^{(j+1)} = r^{(j+1)} + \beta^{(j)} p^{(j)}$
-		
+	   $\mathcal{Q}_{:,j+1} \leftarrow (\mathcal{A},\mathcal{Q}_{:,j})$
+	   
+	   \For{$i=0 \dots j$}{
+	   	  $\mathcal{H}_{i,j} = (\mathcal{Q}^{T}_{:,i},\mathcal{Q}_{:,j+1})$
+	   	   
+	   	   $\mathcal{Q}_{:,j+1} \leftarrow  \mathcal{Q}_{:,j+1} - (\mathcal{A},\mathcal{Q}_{:,j})$
+	   }
+	   
+	   $\mathcal{H}_{j+1,j} = \lVert \mathcal{Q}^{(j)} \rVert$
+	   
+
+	  
+	  $\mathcal{H}_{:j+2,:j+1}^{T} \mathcal{H}_{:j+2,:j+1} y = \beta \mathcal{H}_{:j+2,:j+1}^{T}  e_1$
+	
+	  $x^{j+1} = x^{(0)} + \mathcal{Q}_{:,:j+1}$ y
+	  
+	  \If {$\lVert r^{(j+1)} \rVert < \mathrm{tol}$}
+	  {
+	  	\textbf{break}
+	  }
 	}
 \end{algorithm}
-	
+
 \end{frame}
+
+\begin{frame}
+	\frametitle{\textbf{4. GMRES results}}
+	\centering
+	\includegraphics[width=0.95\linewidth]{images/gmres_its}
+\end{frame}
+
+

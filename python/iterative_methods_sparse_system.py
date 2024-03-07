@@ -1,6 +1,19 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+
+font = {'weight' : 'normal',
+        'size'   : 13}
+
+plt.rc('font', **font)
+colors=['#1b9e77','#d95f02','#7570b3','#e7298a','#66a61e','#e6ab02']
+#linestyles = ['-', '--', ':', '-.']
+
+cycle = plt.cycler("color", colors) #+ plt.cycler("linestyle", linestyles+linestyles)
+
+myparams = {'axes.prop_cycle': cycle}
+plt.rcParams.update(myparams)
+
 def fill_matrix_poisson(A,b,nx,ny):
     N = nx*ny
     dx = 1./ (nx-1)
@@ -113,7 +126,7 @@ def jacobi(A,b,tol):
     print("Jacobi - spectral radius is : ", np.max(np.abs(eigs)))
 
     # Iterate for N times                               s                                                                                                                                           
-    while (err[-1] > tol ):
+    while (err[-1]/err[0] > tol ):
         x = (b - np.dot(R,x)) / D
         it = it+1
         err.append(calc_residual_norm(A,b,x))
@@ -138,7 +151,7 @@ def gauss_seidel(A,b,tol):
 
 
     # Iterate for N times                               s                                                                                                                                           
-    while (err[-1] > tol ):
+    while (err[-1]/err[0] > tol ):
         for i in range(0,N):
             x[i] = (b[i] - np.dot(A[i,0:i],x[0:i]) - np.dot(A[i,i+1:],x[i+1:])) / A[i,i]
         it = it+1
@@ -162,7 +175,7 @@ def conjugate_gradient(A,b,tol):
         alpha = np.dot(p,r)/np.dot(p,Ap)
         x = x + alpha*p
         r = b - A.dot(x)
-        if np.sqrt(np.sum((r**2))) < tol:
+        if np.sqrt(np.sum((r**2))) /err[0] < tol:
             break
         else:
             beta = -np.dot(r,Ap)/np.dot(p,Ap)
@@ -208,7 +221,7 @@ def gmres(A, b, tol) :
         x = Q[:,:j+1].dot(y)
         res = np.linalg.norm(b - A.dot(x))
         err.append(res)
-        if (res<tol):
+        if (res/err[0]<tol):
             break
     return x,err
 
@@ -240,116 +253,145 @@ def run_adv_diff(Pe,nx,ny,method):
 #Run Jacobi and see mesh influence
 # Poisson problem
 j_meshes=[5,10,20,30]
-j_its=[]
+j_a_its=[]
 for i in j_meshes:
     T,err = run_poisson(i,i,jacobi)
-    j_its.append(len(err))
+    j_a_its.append(len(err))
 
-plt.plot(j_meshes,j_its,'-o',label="Problem A")
 
 # Peclet=1
-j_its=[]
+j_b_its=[]
 for i in j_meshes:
     T,err = run_adv_diff(1,i,i,jacobi)
-    j_its.append(len(err))
+    j_b_its.append(len(err))
 
-plt.plot(j_meshes,j_its,'-^',label="Problem B - Pe=1")
 
 # Peclet=10
-j_its=[]
+j_c_its=[]
 for i in j_meshes:
     T,err = run_adv_diff(10,i,i,jacobi)
-    j_its.append(len(err))
+    j_c_its.append(len(err))
 
-plt.plot(j_meshes,j_its,'-s',label="Problem B - Pe=10")
+plt.plot(j_meshes,j_a_its,'-o',ms=9,label="Problem A")
+plt.plot(j_meshes,j_b_its,'-^',ms=9,label="Problem B - Pe=1")
+plt.plot(j_meshes,j_c_its,'-s',ms=9,label="Problem B - Pe=10")
+plt.xlabel("Number of nodes per axis ($\sqrt{n_{dofs}}$)")
+plt.ylabel("Number of iterations (tol=$10^{-3}$)")
 plt.legend()
+plt.tight_layout()
+plt.savefig("../slides/images/j_its.pdf")
 plt.show()
 
 
 #Run Gauss-Seidel and see mesh influence
 # Poisson problem
 j_meshes=[5,10,20,30]
-j_its=[]
+gs_a_its=[]
 for i in j_meshes:
     T,err = run_poisson(i,i,gauss_seidel)
-    j_its.append(len(err))
+    gs_a_its.append(len(err))
 
-plt.plot(j_meshes,j_its,'-o',label="Problem A")
 
 # Peclet=1
-j_its=[]
+gs_b_its=[]
 for i in j_meshes:
     T,err = run_adv_diff(1,i,i,gauss_seidel)
-    j_its.append(len(err))
+    gs_b_its.append(len(err))
 
-plt.plot(j_meshes,j_its,'-^',label="Problem B - Pe=1")
 
 # Peclet=10
-j_its=[]
+gs_c_its=[]
 for i in j_meshes:
     T,err = run_adv_diff(10,i,i,gauss_seidel)
-    j_its.append(len(err))
+    gs_c_its.append(len(err))
 
-plt.plot(j_meshes,j_its,'-s',label="Problem B - Pe=10")
+plt.plot(j_meshes,gs_a_its,'-o',ms=9,label="Problem A")
+plt.plot(j_meshes,gs_b_its,'-^',ms=9,label="Problem B - Pe=1")
+plt.plot(j_meshes,gs_c_its,'-s',ms=9,label="Problem B - Pe=10")
+
+plt.xlabel("Number of nodes per axis ($\sqrt{n_{dofs}}$)")
+plt.ylabel("Number of iterations (tol=$10^{-3}$)")
 plt.legend()
+plt.tight_layout()
+plt.savefig("../slides/images/gs_its.pdf")
+plt.show()
+
+plt.plot(j_meshes,j_a_its,'--o',mfc='none', mec=colors[0],ms=9,label="Jacobi A")
+plt.plot(j_meshes,j_c_its,'--s',mfc='none', mec=colors[1],ms=9,label="Jacobi B")
+plt.plot(j_meshes,gs_a_its,'-o',color=colors[0],ms=9,label="GS A")
+plt.plot(j_meshes,gs_c_its,'-s',color=colors[1],ms=9,label="GS B")
+plt.savefig("../slides/images/gs_j_its.pdf")
+plt.xlabel("Number of nodes per axis ($\sqrt{n_{dofs}}$)")
+plt.ylabel("Number of iterations (tol=$10^{-3}$)")
+plt.legend()
+plt.tight_layout()
 plt.show()
 
 
 #Run CG and see mesh influence
 # Poisson problem
-j_meshes=[5,10,20,30]
-j_its=[]
-for i in j_meshes:
+cg_meshes=[5,10,20,30,40,50]
+cg_a_its=[]
+for i in cg_meshes:
     T,err = run_poisson(i,i,conjugate_gradient)
-    j_its.append(len(err))
+    cg_a_its.append(len(err))
 
-plt.plot(j_meshes,j_its,'-o',label="Problem A")
 
 # Peclet=1
-j_its=[]
-for i in j_meshes:
+cg_b_its=[]
+for i in cg_meshes:
     T,err = run_adv_diff(1,i,i,conjugate_gradient)
-    j_its.append(len(err))
+    cg_b_its.append(len(err))
 
-plt.plot(j_meshes,j_its,'-^',label="Problem B - Pe=1")
 
 # Peclet=10
-j_its=[]
-for i in j_meshes:
+cg_c_its=[]
+for i in cg_meshes:
     T,err = run_adv_diff(10,i,i,conjugate_gradient)
-    j_its.append(len(err))
+    cg_c_its.append(len(err))
 
-plt.plot(j_meshes,j_its,'-s',label="Problem B - Pe=10")
+plt.plot(cg_meshes,cg_a_its,'-o',ms=9,label="Problem A")
+plt.plot(cg_meshes,cg_b_its,'-^',ms=9,label="Problem B - Pe=1")
+plt.plot(cg_meshes,cg_c_its,'-s',ms=9,label="Problem B - Pe=10")
+plt.xlabel("Number of nodes per axis ($\sqrt{n_{dofs}}$)")
+plt.ylabel("Number of iterations (tol=$10^{-3}$)")
 plt.legend()
+plt.tight_layout()
+plt.savefig("../slides/images/cg_its.pdf")
 plt.show()
 
 #Run GMRES and see mesh influence
 # Poisson problem
-j_meshes=[5,10,20,30]
-j_its=[]
-for i in j_meshes:
+gmres_a_its=[]
+for i in cg_meshes:
     T,err = run_poisson(i,i,gmres)
-    j_its.append(len(err))
+    gmres_a_its.append(len(err))
 
-plt.plot(j_meshes,j_its,'-o',label="Problem A")
 
 # Peclet=1
-j_its=[]
-for i in j_meshes:
+gmres_b_its=[]
+for i in cg_meshes:
     T,err = run_adv_diff(1,i,i,gmres)
-    j_its.append(len(err))
+    gmres_b_its.append(len(err))
 
-plt.plot(j_meshes,j_its,'-^',label="Problem B - Pe=1")
 
 # Peclet=10
-j_its=[]
-for i in j_meshes:
+gmres_c_its=[]
+for i in cg_meshes:
     T,err = run_adv_diff(10,i,i,gmres)
-    j_its.append(len(err))
+    gmres_c_its.append(len(err))
 
-plt.plot(j_meshes,j_its,'-s',label="Problem B - Pe=10")
+plt.plot(cg_meshes,gmres_a_its,'-o',ms=9,label="Problem A")
+plt.plot(cg_meshes,gmres_b_its,'-^',ms=9,label="Problem B - Pe=1")
+plt.plot(cg_meshes,gmres_c_its,'-s',ms=9,label="Problem B - Pe=10")
+plt.xlabel("Number of nodes per axis ($\sqrt{n_{dofs}}$)")
+plt.ylabel("Number of iterations (tol=$10^{-3}$)")
 plt.legend()
+plt.tight_layout()
+plt.savefig("../slides/images/gmres_its.pdf")
 plt.show()
+
+
 
 
 

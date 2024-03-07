@@ -1,5 +1,5 @@
 \begin{frame}
-	\frametitle{\textbf{1. Problem A: Steady-state Poisson equation}}
+	\frametitle{\textbf{2. Problem A: Steady-state Poisson equation}}
     
     Consider a $2$-dimensional unit square $\Omega = (0,1)^d$ and the following problem subjected to homogeneous Dirichlet boundary conditions: 
     \vspace{0.5cm}
@@ -49,7 +49,7 @@
 
 
 \begin{frame}
-\frametitle{\textbf{1. Problem B: Steady-state Advection-diffusion equation}}
+\frametitle{\textbf{2. Problem B: Steady-state Advection-diffusion equation}}
 
 Consider a $2$-dimensional unit square $\Omega = (0,1)^d$ and the following problem subjected to homogeneous Dirichlet boundary conditions: 
 \vspace{0.5cm}
@@ -104,7 +104,7 @@ Consider a $2$-dimensional unit square $\Omega = (0,1)^d$ and the following prob
 
 
 \begin{frame}
-	\frametitle{\textbf{1. Problem A: FDM}}
+	\frametitle{\textbf{2. Problem A: FDM}}
 	
 	\begin{columns}[c]
 		\begin{column}{0.5\textwidth}
@@ -112,7 +112,7 @@ Consider a $2$-dimensional unit square $\Omega = (0,1)^d$ and the following prob
 			\begin{framed}
 				Find a scalar $T$ in $\Omega \rightarrow \mathbb{R}$ satisfying:
 				\begin{align*}
-					\partial_j \partial_j T =& 1 \ \textrm{ in } \Omega\\
+					-\partial_j \partial_j T =& 10 \ \textrm{ in } \Omega\\
 					T =& 0 \ \textrm{ in } \Gamma
 				\end{align*}
 			\end{framed}
@@ -172,14 +172,14 @@ Consider a $2$-dimensional unit square $\Omega = (0,1)^d$ and the following prob
 	\vspace{0.4cm}
 We divide the domain into a grid and obtain:
 \begin{align*}
-	\frac{1}{\Delta x^2} \pp{-T_{i+1} + 2T_{i} - T_{i-1}} + \frac{1}{\Delta y^2} \pp{-T_{i+n_x} + 2T_{i} - T_{i-n_x}} &= 1  \ \forall i \in \Omega
+	\frac{1}{\Delta x^2} \pp{-T_{i+1} + 2T_{i} - T_{i-1}} + \frac{1}{\Delta y^2} \pp{-T_{i+n_x} + 2T_{i} - T_{i-n_x}} &= 10  \ \forall i \in \Omega
 	\\
 	T_i &= 0 \  \forall i \in \Gamma
 \end{align*}  
 \end{frame}
 
 \begin{frame}
-	\frametitle{\textbf{1. Problem B: FDM}}
+	\frametitle{\textbf{2. Problem B: FDM}}
 	
 	\begin{columns}[c]
 		\begin{column}{0.5\textwidth}
@@ -187,7 +187,7 @@ We divide the domain into a grid and obtain:
 		\begin{framed}
 	Find a scalar $T$ in $\Omega \rightarrow \mathbb{R}$ satisfying:
 	\begin{align*}
-		u_j \partial_j T + \epsilon \partial_j \partial_j T =& 1 \ \textrm{ in } \Omega\\
+		u_j \partial_j T - \epsilon \partial_j \partial_j T =& 1 \ \textrm{ in } \Omega\\
 		T =& 0 \ \textrm{ in } \Gamma \\
 		u_j =& 1 \ \forall j \in [1,d]
 	\end{align*}
@@ -259,7 +259,7 @@ We divide the domain into a grid and obtain:
 \def\nrowsb{35}
 \def\ncolsb{35}
 \begin{frame}
-	\frametitle{\textbf{1. Sparsity pattern of the matrix}}
+	\frametitle{\textbf{2. Sparsity pattern of the matrix}}
 	
 The matrix A is penta-diagonal. For $n$ nodes it has a maximum of 5 non-zero elements. 
 
@@ -289,7 +289,7 @@ The matrix A is penta-diagonal. For $n$ nodes it has a maximum of 5 non-zero ele
 
 
 \begin{frame}[fragile]
-	\frametitle{\textbf{1. Problem A: Python code part 1}}
+	\frametitle{\textbf{2. Problem A: Python code part 1}}
 
 
 \begin{PYTHON}
@@ -322,7 +322,7 @@ def fill_matrix_poisson(A,b,nx,ny):
 \end{frame}
 
 \begin{frame}[fragile]
-	\frametitle{\textbf{1. Problem A: Python code part 2}}
+	\frametitle{\textbf{2. Problem A: Python code part 2}}
 	
 	
 	\begin{PYTHON}
@@ -347,7 +347,7 @@ for i in range(1,nx-1):
 \end{frame}
 
 \begin{frame}[fragile]
-	\frametitle{\textbf{1. Problem B: Python code}}
+	\frametitle{\textbf{2. Problem B: Python code}}
 	
 	
 This is left as an exercise for you (or you can just clone it from the github repository...)
@@ -356,7 +356,7 @@ This is left as an exercise for you (or you can just clone it from the github re
 
 
 \begin{frame}[fragile]
-	\frametitle{\textbf{1. Final}}
+	\frametitle{\textbf{2. Final}}
 
 Final problem statement
 \vspace{0.5cm}

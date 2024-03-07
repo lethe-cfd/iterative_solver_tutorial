@@ -1,7 +1,7 @@
 \subsection{Jacobi}
 
 \begin{frame}
-		\frametitle{\textbf{2. Iterative methods}}
+		\frametitle{\textbf{3. Iterative methods}}
 	
 	
 	    \visible<1->{
@@ -23,7 +23,7 @@
 \end{frame}
 
 \begin{frame} 
-\frametitle{\textbf{2. Jacobi's method component form}}
+\frametitle{\textbf{3. Jacobi's method component form}}
 
 In what follows, $\xi_i^{(k)}$ denotes the ith component of the iterate $x_k$. In the same way, $\beta_i$ will be the ith component of the right-hand side $b$. $a_{ij}$ is the ijth component of $\mathcal{A}$.
 
@@ -40,7 +40,7 @@ Which results in:
 \end{frame}
 
 \begin{frame} 
-	\frametitle{\textbf{2. Jacobi's method matrix form}}
+	\frametitle{\textbf{3. Jacobi's method matrix form}}
 	
 	We begin with the decomposition:
 	\[
@@ -52,24 +52,19 @@ Which results in:
 	\[
 	x^{k+1} = \mathcal{D}^{-1} (\mathcal{E} + \mathcal{F})x^{k} + \mathcal{D}^{-1} b
 	\]
+\end{frame}
+
+\begin{frame}
+\frametitle{\textbf{3. Jacobi's resuls}}
 	
-\end{frame}
-
-\begin{frame}
-\frametitle{\textbf{2. Jacobi's result for Problem A}}
-\end{frame}
-
-\begin{frame}
-\frametitle{\textbf{2. Jacobi's result for Problem B}}
-\end{frame}
-
-\begin{frame}
-	\frametitle{\textbf{2. Code for Jaocbi's method}}
+\begin{center}
+\includegraphics[width=0.95\linewidth]{images/j_its}
+\end{center}
 \end{frame}
 
 \subsection{Gauss Seidel}
 \begin{frame} 
-	\frametitle{\textbf{2. Gauss Seidel's method component form}}
+	\frametitle{\textbf{3. Gauss Seidel's method component form}}
 	
 	Gauss Seidel's method consists in solving:
 	\[
@@ -84,7 +79,7 @@ Which results in:
 \end{frame}
 
 \begin{frame} 
-	\frametitle{\textbf{2. Gauss Seidel's method matrix form}}
+	\frametitle{\textbf{3. Gauss Seidel's method matrix form}}
 	
 	We continue with the decomposition:
 	\[
@@ -100,21 +95,15 @@ Which results in:
 \end{frame}
 
 \begin{frame}
-	\frametitle{\textbf{2. Gauss Seidel's result for Problem A}}
-\end{frame}
-
-\begin{frame}
-	\frametitle{\textbf{2. Gauss Seidel's result for Problem B}}
-\end{frame}
-
-\begin{frame}
-	\frametitle{\textbf{2. Code for Gauss Seidel's method}}
+	\frametitle{\textbf{3. Gauss Seidel results}}
+	\centering
+	\includegraphics[width=0.95\linewidth]{images/j_its}
 \end{frame}
 
 \subsection{Convergence}
 
 \begin{frame}
-\frametitle{\textbf{2. Convergence}}
+\frametitle{\textbf{3. Convergence}}
 
 All methods we have seen define a recurrence (or series of iterate):
 \[
@@ -135,7 +124,7 @@ Where $\mathcal{G}$ is an \textit{iteration matrix}.
 \end{frame}
 
 \begin{frame}
-	\frametitle{\textbf{2. Theorem}}
+	\frametitle{\textbf{3. Theorem}}
 
 \begin{shaded}
 	\textbf{General convergence theorem}
