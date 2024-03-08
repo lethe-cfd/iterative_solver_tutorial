@@ -20,17 +20,13 @@ Krylov methods are methods for which $\mathcal{K}^m$ is:
 \mathcal{K}^{(m)} (\mathcal{A},r^{(0)}) = \mathrm{span} \left\{ r^{(0)}, \mathcal{A}r^{(0)}, \mathcal{A}^2r^{(0)}, \mathcal{A}^{3}r^{(0)}, ... , \mathcal{A}^{m-1}r^{(0)}\right\}
 \]
 
-This is tricky and I won't be able to present this in much detail, but we will present two such methods:
-\begin{itemize}
-	\item Conjugate Gradient
-	\item GMRES
-\end{itemize}
+Essentially, the Krylov subspaces are spanned by vectors of the form $p(\mathcal{A})v$ where $p$ is a polynomial. Consequently, they approximate $\mathcal{A}^{-1}b$ by $p(\mathcal{A})b$ where $p$ is a \textit{good} polynomial.
 \end{frame}
 
 \subsection{Conjugate gradient }
 
 
-\begin{frame}[fragile]{\textbf{4. CG algorithm}}
+\begin{frame}[fragile]{\textbf{4. Conjugate gradient (CG) algorithm}}
 The conjugate gradient method is the simplest Krylov method (in my opinion). It is very efficient, but it only works for symmetric matrices. In the following, the scalar product is noted $(u,v)$.
 
 \vspace{0.5cm}
@@ -74,16 +70,11 @@ The conjugate gradient method is the simplest Krylov method (in my opinion). It 
 	
 	
 	The GMRES algorithm uses the Arnoldi iteration for numerical stability. The Arnoldi iteration
-%	produces Hn, an (n + 1) × n upper Hessenberg matrix, and Qn, a matrix whose columns make up an
-%	orthonormal basis of Kn(A, b), such that AQn = Qn+1Hn. The GMRES algorithm nds the vector
-%	xn which minimizes the norm kb − Axnk2
-%	, where xn = Qnyn + x0 for some yn ∈ R
-%	n. Since the
-%	columns of Qn are orthonormal, the residual can be equivalently computed as
-%	
-%	 The algorithm is quite complex. I  give it here, but you will need to take a dive into the code to acquire a better understanding of it.
-%	
-	\vspace{0.5cm}
+	produces $\mathcal{H}^{(n)}$, an $(n + 1) \times n$ upper Hessenberg matrix, and $\mathcal{Q}^{(n)}$, a matrix whose columns make up an	orthonormal basis of $\mathcal{K}^{(n)}(\mathcal{A}, b)$, such that $\mathcal{A}\mathcal{Q}^{(n)} = \mathcal{Q}^{(n+1)}\mathcal{H}^{(n)}$. The GMRES algorithm finds the vector	$x^{(n)}$ that minimizes the norm $\lVert (\mathcal{A},x^{(n)}) - b \rVert$ where $x^{(n)} = (\mathcal{Q}^{(n)},y^{(n)}) + x^{(0)}$ for some $y^{(n)} \in \mathbb{R}$
+	
+	 The algorithm is quite complex. I  give it here, but you will need to take a dive into the code to acquire a better understanding of it.
+
+
 	
 \end{frame}
 
@@ -121,7 +112,7 @@ The conjugate gradient method is the simplest Krylov method (in my opinion). It 
 	   
 
 	  
-	  $\mathcal{H}_{:j+2,:j+1}^{T} \mathcal{H}_{:j+2,:j+1} y = \beta \mathcal{H}_{:j+2,:j+1}^{T}  e_1$
+	  solve the least-square problem: $\mathcal{H}_{:j+2,:j+1}^{T} \mathcal{H}_{:j+2,:j+1} y = \beta \mathcal{H}_{:j+2,:j+1}^{T}  e_1$
 	
 	  $x^{j+1} = x^{(0)} + \mathcal{Q}_{:,:j+1}$ y
 	  

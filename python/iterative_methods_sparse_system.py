@@ -7,10 +7,7 @@ font = {'weight' : 'normal',
 
 plt.rc('font', **font)
 colors=['#1b9e77','#d95f02','#7570b3','#e7298a','#66a61e','#e6ab02']
-#linestyles = ['-', '--', ':', '-.']
-
-cycle = plt.cycler("color", colors) #+ plt.cycler("linestyle", linestyles+linestyles)
-
+cycle = plt.cycler("color", colors) 
 myparams = {'axes.prop_cycle': cycle}
 plt.rcParams.update(myparams)
 
@@ -156,8 +153,7 @@ def gauss_seidel(A,b,tol):
             x[i] = (b[i] - np.dot(A[i,0:i],x[0:i]) - np.dot(A[i,i+1:],x[i+1:])) / A[i,i]
         it = it+1
         err.append(calc_residual_norm(A,b,x))
-
-    return x, err
+5
 
 def conjugate_gradient(A,b,tol):
     N = b.size
@@ -243,13 +239,6 @@ def run_adv_diff(Pe,nx,ny,method):
   T, err=method(A,b,1e-3)
   return T,err
   
-  
-  
-
-
-#run_poisson(25,25)
-#run_adv_diff(10,25,25)
-
 #Run Jacobi and see mesh influence
 # Poisson problem
 j_meshes=[5,10,20,30]
